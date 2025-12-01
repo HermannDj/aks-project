@@ -19,7 +19,7 @@ jobs:
 
       - name: Docker build Validation (PR only)
         if: github.event_name == 'pull_request'
-        run: docker build -t myapp:latest .
+        run: docker build -t k8s-test-app:latest .
 
   build_and_push:
     if: github.ref == 'refs/heads/main'
