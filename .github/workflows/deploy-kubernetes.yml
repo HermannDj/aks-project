@@ -68,12 +68,14 @@ jobs:
 
       - name: Configure Kubernetes
         run: |
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d | tr -d '\r' > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/deployment.yml
+          kubectl apply -f k8s/service.yml
 
  
     
