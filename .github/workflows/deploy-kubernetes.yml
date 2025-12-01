@@ -15,12 +15,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r flask_app/requirements.txt
-
+          pip install -r requirements.txt
 
       - name: Docker build Validation (PR only)
         if: github.event_name == 'pull_request'
-        run: docker build -t k8s-test-app -f Dockerfile .
+        run: docker build -t myapp:latest .
 
   build_and_push:
     if: github.ref == 'refs/heads/main'
@@ -43,11 +42,11 @@ jobs:
 
       - name: Build and Save Docker image
         run: |
-          docker build -t ${{ vars.ACR_NAME }}.azurecr.io/k8s-test-app:latest -f Dockerfile .
+          docker build -t ${{ vars.ACR_NAME }}.azurecr.io/myapp:latest .
       
       - name: Push Docker image to ACR
         run: |
-          docker push ${{ vars.ACR_NAME }}.azurecr.io/k8s-test-app:latestp
+          docker push ${{ vars.ACR_NAME }}.azurecr.io/myapp:latest
 
   deploy:
     if: github.ref == 'refs/heads/main'
