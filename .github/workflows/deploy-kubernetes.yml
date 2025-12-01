@@ -1,0 +1,73 @@
+name: CI/CD Pipeline for K8s Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Docker build Validation (PR only)
+        if: github.event_name == 'pull_request'
+        run: docker build -t k8s-test-app:latest .
+
+  build_and_push:
+    if: github.ref == 'refs/heads/main'
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+            client-id: ${{ vars.CLIENT_ID }}
+            tenant-id: ${{ vars.TENANT_ID }}
+            subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Azure Container Registry - Log in
+        run: |
+          az acr login --name ${{ vars.ACR_NAME }}
+
+      - name: Build and Save Docker image
+        run: |
+          docker build -t ${{ vars.ACR_NAME }}.azurecr.io/k8s-test-app:latest .
+      
+      - name: Push Docker image to ACR
+        run: |
+          docker push ${{ vars.ACR_NAME }}.azurecr.io/k8s-test-app:latest
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build_and_push
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+ 
+    
