@@ -42,12 +42,11 @@ jobs:
 
       - name: Build and Save Docker image
         run: |
-          docker build -t ${{ vars.ACR_NAME }}.azurecr.io/myapp:latest .
+          docker build -t ${{ vars.ACR_NAME }}.azurecr.io/k8s-test-app:latest .
       
       - name: Push Docker image to ACR
         run: |
-          docker push ${{ vars.ACR_NAME }}.azurecr.io/myapp:latest
-
+          docker push ${{ vars.ACR_NAME }}.azurecr.io/k8s-test-app:latest
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: build_and_push
