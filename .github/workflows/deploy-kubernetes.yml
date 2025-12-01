@@ -61,16 +61,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Azure Login (OIDC)
+        uses: azure/login@v1
+        with:
+          client-id: ${{ vars.CLIENT_ID }}
+          tenant-id: ${{ vars.TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'latest'
+
+      - name: Install kubelogin
+        uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: 'latest'
 
       - name: Configure Kubernetes
         run: |
           mkdir -p "$HOME/.kube"
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d | tr -d '\r' > "$HOME/.kube/config"
           chmod 600 "$HOME/.kube/config"
+
+      - name: Convert kubeconfig for non-interactive login
+        run: |
+          kubelogin convert-kubeconfig -l azurecli --kubeconfig "$HOME/.kube/config"
 
       - name: Deploy to AKS
         run: |
