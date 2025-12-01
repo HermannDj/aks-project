@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""Simple Python application"""
+from flask import Flask
+
+app = Flask(__name__)
 
 
-def main():
-    print("Hello fromMyApp!")
-    print("Application is running successfully.")
+@app.get("/")
+def index():
+    return "OK: k8s-test-app is running"
+
+
+@app.get("/healthz")
+def healthz():
+    return "healthy"
 
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=5000)
