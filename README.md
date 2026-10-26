@@ -78,4 +78,4 @@ Azure (AKS, ACR, Azure AD / OIDC) · Kubernetes · Docker · GitHub Actions · P
 ## Author
 
 **Hermann Djoko** — DevOps & Cloud Engineer (AWS / Azure)
-[GitHub](https://github.com/HermannDj) · [LinkedIn](https://linkedin.com/in/hermanndjoko) · harnaud.djoko@gmail.com
+[GitHub](https://github.com/HermannDj) · [LinkedIn](https://linkedin.com/in/hermann-djoko) · harnaud.djoko@gmail.com
